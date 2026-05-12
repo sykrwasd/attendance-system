@@ -1,23 +1,19 @@
-import { createClient } from '@/utils/supabase/server'
+"use client"
 
-export default async function Page() {
+import { useStaff } from '../hooks/useStaff'
 
-  const supabase = await createClient()
+export default function Page() {
 
-  const { data, error } = await supabase
-    .from('employee')
-    .select('*')
-
-  console.log('DATA:', data)
-  console.log('ERROR:', error)
+  const { staff,loading} = useStaff()
+  console.log(staff)
 
   return (
     <div>
       <h1>Employee</h1>
 
-      {data?.map((item) => (
-        <div key={item.id}>
-          {item.name}
+      {staff?.map((item) => (
+        <div key={item.created_at}>
+          {item.staff_name}
         </div>
       ))}
     </div>
