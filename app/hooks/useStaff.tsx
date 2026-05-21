@@ -1,19 +1,26 @@
 import { Staff } from "@/types";
 import { useEffect, useState } from "react";
-import { getStaff } from "../lib/api";
+import * as api from "../lib/api";
 
-export function useStaff(){
-    const [staff, setStaff] = useState<Staff[]>([]);
-    const [loading, setLoading] = useState(true)
+export function useStaff() {
+  const [staff, setStaff] = useState<Staff[]>([]);
+  const [loading, setLoading] = useState(true);
 
-     useEffect(() => {
-    getStaff().then((data) => {
-      setStaff(data);
-      console.log(data);
-      setLoading(false);
-    });
+  async function refresh() {
+    setLoading(true);
+    setStaff(await api.getStaff());
+    setLoading(false);
+  }
+
+  async function add(item:any){
+     await api.addStaff(item)
+    refresh()
+    
+  }
+
+  useEffect(() => {
+    refresh();
   }, []);
 
-  return { staff, loading };
-
+  return { staff, loading, add };
 }
