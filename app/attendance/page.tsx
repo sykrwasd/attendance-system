@@ -1,108 +1,135 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-
-type Booking = {
-  day: string;
-  date: string;
-  time: string;
-  employeeName: string;
-  employeeId: string;
-};
+import { createClient } from "@/utils/supabase/client";
 
 export default function AttendancePage() {
-  const [formData, setFormData] = useState({
-    employeeName: "",
-    employeeId: "",
-    day: "Monday",
-    date: "",
-    time: "",
-  });
+  const supabase = createClient();
 
-  // Dummy data booking staff lain
-  const [bookings, setBookings] = useState<Booking[]>([
-    {
-      day: "Monday",
-      date: "2026-05-25",
-      time: "09:00 AM",
-      employeeName: "Ali",
-      employeeId: "EMP001",
-    },
-    {
-      day: "Tuesday",
-      date: "2026-05-26",
-      time: "02:00 PM",
-      employeeName: "Siti",
-      employeeId: "EMP002",
-    },
-  ]);
+  const [employee, setEmployee] = useState<any>(null);
+  const [scheduleData, setScheduleData] = useState<any>([]);
+  const [showMenu, setShowMenu] = useState(false);
 
-  const [submitted, setSubmitted] = useState(false);
+  const handleLogout = () => {
+    localStorage.removeItem("id");
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    window.location.href = "/login";
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const days = [
+    "SUNDAY",
+    "MONDAY",
+    "TUESDAY",
+    "WEDNESDAY",
+    "THURSDAY",
+    "FRIDAY",
+    "SATURDAY",
+  ];
 
-    // Check kalau slot dah diambil
-    const alreadyBooked = bookings.find(
-      (booking) =>
-        booking.date === formData.date && booking.time === formData.time,
-    );
+  const shifts: any = {
+    1: "4.00PM - 7.30PM",
+    2: "7.30PM - 11.00PM",
+  };
 
-    if (alreadyBooked) {
-      alert("This slot has already been booked!");
+  const getWeekDates = () => {
+    const today = new Date();
+
+    const sunday = new Date(today);
+    sunday.setDate(today.getDate() - today.getDay());
+
+    const saturday = new Date(sunday);
+    saturday.setDate(sunday.getDate() + 6);
+
+    return {
+      sunday,
+      saturday,
+    };
+  };
+
+  const getWeekRange = () => {
+    const { sunday, saturday } = getWeekDates();
+
+    const formatDate = (date: Date) => {
+      return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
+    };
+
+    return `${formatDate(sunday)} - ${formatDate(saturday)}`;
+  };
+
+  useEffect(() => {
+    fetchSchedule();
+  }, []);
+
+  const fetchSchedule = async () => {
+    const { sunday, saturday } = getWeekDates();
+
+    const { data, error } = await supabase
+      .from("bookSchedule")
+      .select("*, employee:staff_id (id, staff_name, staff_role)")
+      .gte("schedule_date", sunday.toISOString().split("T")[0])
+      .lte("schedule_date", saturday.toISOString().split("T")[0]);
+    console.log(data);
+
+    if (error) {
+      console.log(error);
       return;
     }
 
-    const newBooking: Booking = {
-      day: formData.day,
-      date: formData.date,
-      time: formData.time,
-      employeeName: formData.employeeName,
-      employeeId: formData.employeeId,
-    };
+    setScheduleData(data);
+  };
 
-    setBookings([...bookings, newBooking]);
+  const getBaristas = (day: string, shift: number) => {
+    return scheduleData.filter((item: any) => {
+      const date = new Date(item.schedule_date);
 
-    setSubmitted(true);
+      const itemDay = days[date.getDay()];
 
-    setTimeout(() => {
-      setSubmitted(false);
-    }, 3000);
-
-    setFormData({
-      employeeName: "",
-      employeeId: "",
-      day: "Monday",
-      date: "",
-      time: "",
+      return itemDay === day && item.schedule_shift === shift;
     });
   };
+
+  useEffect(() => {
+    const fetchEmployee = async () => {
+      const userId = localStorage.getItem("id");
+
+      if (!userId) return;
+
+      const { data } = await supabase
+        .from("employee")
+        .select("*")
+        .eq("id", userId)
+        .single();
+
+      if (data) {
+        setEmployee(data);
+      }
+    };
+
+    fetchEmployee();
+  }, []);
+
+  if (!employee) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        Loading...
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen">
       {/* Sidebar */}
       <div className="w-64 bg-gray-900 text-white p-5 flex flex-col items-center">
-        <div>
-          <Image
-            className="mb-4"
-            src="/logo_amber.png"
-            alt="Amber Coffee logo"
-            width={200}
-            height={200}
-            priority
-          />
-        </div>
+        <Image
+          className="mb-4"
+          src="/logo_amber.png"
+          alt="Amber Coffee logo"
+          width={200}
+          height={200}
+          priority
+        />
 
         <ul className="space-y-4 mt-10">
           <li>
@@ -119,134 +146,106 @@ export default function AttendancePage() {
         </ul>
       </div>
 
-      {/* Timetable UI */}
+      {/* Content */}
+      <div className="flex-1 p-8 bg-gray-100">
+        <div className="flex justify-between items-start mb-6">
+          {/* Header */}
+          <div>
+            <h1 className="text-2xl font-bold text-gray-800">
+              Attendance Schedule
+            </h1>
 
-      <div className="flex-1 p-8 relative bg-gray-100">
-        <div className="flex justify-end mb-6 relative">
-          <Link href="/scheduling">
-            <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2">
-              <span className="text-lg font-bold">+</span>
-              Add Booking
+            <p className="text-gray-500">Weekly schedule ({getWeekRange()})</p>
+          </div>
+
+          {/* Profile */}
+          <div className="relative">
+            <button
+              onClick={() => setShowMenu(!showMenu)}
+              className="flex items-center gap-3 bg-white px-4 py-2 rounded-xl shadow hover:bg-gray-50"
+            >
+              <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center font-bold">
+                {employee.staff_name.charAt(0).toUpperCase()}
+              </div>
+
+              <div className="text-left">
+                <p className="text-sm font-semibold text-gray-800">
+                  {employee.staff_name}
+                </p>
+
+                <p className="text-xs text-gray-500">{employee.staff_role}</p>
+              </div>
             </button>
-          </Link>
+
+            {/* Dropdown */}
+            {showMenu && (
+              <div className="absolute top-16 right-0 w-48 bg-white rounded-xl shadow-lg border z-50">
+                <Link
+                  href="/profile"
+                  className="block px-4 py-3 hover:bg-gray-100 text-sm text-gray-700"
+                >
+                  👤 Profile Details
+                </Link>
+
+                <button
+                  onClick={handleLogout}
+                  className="w-full text-left px-4 py-3 hover:bg-gray-100 text-sm text-red-500"
+                >
+                  🚪 Logout
+                </button>
+              </div>
+            )}
+          </div>
         </div>
+
         {/* Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse border border-sky-300">
+        <div className="overflow-x-auto rounded-xl">
+          <table className="w-full border-collapse border border-sky-300 bg-white">
             <thead>
               <tr className="bg-sky-100 text-sky-700">
-                <th className="border border-sky-300 p-3 w-32">Day / Time</th>
+                <th className="border border-sky-300 p-3 w-15">DAY</th>
 
-                <th className="border border-sky-300 p-3">8AM - 10AM</th>
+                <th className="border border-sky-300 p-3 w-70">
+                  4.00PM - 7.30PM
+                </th>
 
-                <th className="border border-sky-300 p-3">10AM - 12PM</th>
-
-                <th className="border border-sky-300 p-3">12PM - 2PM</th>
-
-                <th className="border border-sky-300 p-3">2PM - 4PM</th>
-
-                <th className="border border-sky-300 p-3">4PM - 6PM</th>
+                <th className="border border-sky-300 p-3 w-70">
+                  7.30PM - 11.00PM
+                </th>
               </tr>
             </thead>
 
             <tbody>
-              {/* Monday */}
-              <tr className="h-28">
-                <td className="border border-sky-300 bg-sky-50 font-bold text-sky-700 text-center">
-                  MONDAY
-                </td>
+              {days.map((day) => (
+                <tr key={day} className="h-28">
+                  <td className="border border-sky-300 bg-sky-50 font-bold text-sky-700 text-center">
+                    {day}
+                  </td>
 
-                <td className="border border-sky-300"></td>
-
-                {/* Booked Slot */}
-                <td className="border border-sky-300 bg-red-200 text-center">
-                  <p className="font-bold text-red-700">BOOKED</p>
-                  <p className="text-sm text-gray-700">Ali</p>
-                  <p className="text-xs text-gray-500">EMP001</p>
-                </td>
-
-                <td className="border border-sky-300"></td>
-
-                <td className="border border-sky-300"></td>
-
-                <td className="border border-sky-300"></td>
-              </tr>
-
-              {/* Tuesday */}
-              <tr className="h-28">
-                <td className="border border-sky-300 bg-sky-50 font-bold text-sky-700 text-center">
-                  TUESDAY
-                </td>
-
-                <td className="border border-sky-300"></td>
-
-                <td className="border border-sky-300"></td>
-
-                <td className="border border-sky-300 bg-green-200 text-center">
-                  <p className="font-bold text-green-700">BOOKED</p>
-                  <p className="text-sm text-gray-700">Siti</p>
-                  <p className="text-xs text-gray-500">EMP002</p>
-                </td>
-
-                <td className="border border-sky-300"></td>
-
-                <td className="border border-sky-300"></td>
-              </tr>
-
-              {/* Wednesday */}
-              <tr className="h-28">
-                <td className="border border-sky-300 bg-sky-50 font-bold text-sky-700 text-center">
-                  WEDNESDAY
-                </td>
-
-                <td className="border border-sky-300"></td>
-
-                <td className="border border-sky-300"></td>
-
-                <td className="border border-sky-300"></td>
-
-                <td className="border border-sky-300"></td>
-
-                <td className="border border-sky-300"></td>
-              </tr>
-
-              {/* Thursday */}
-              <tr className="h-28">
-                <td className="border border-sky-300 bg-sky-50 font-bold text-sky-700 text-center">
-                  THURSDAY
-                </td>
-
-                <td className="border border-sky-300"></td>
-
-                <td className="border border-sky-300"></td>
-
-                <td className="border border-sky-300"></td>
-
-                <td className="border border-sky-300 bg-yellow-200 text-center">
-                  <p className="font-bold text-yellow-700">BOOKED</p>
-                  <p className="text-sm text-gray-700">John</p>
-                  <p className="text-xs text-gray-500">EMP003</p>
-                </td>
-
-                <td className="border border-sky-300"></td>
-              </tr>
-
-              {/* Friday */}
-              <tr className="h-28">
-                <td className="border border-sky-300 bg-sky-50 font-bold text-sky-700 text-center">
-                  FRIDAY
-                </td>
-
-                <td className="border border-sky-300"></td>
-
-                <td className="border border-sky-300"></td>
-
-                <td className="border border-sky-300"></td>
-
-                <td className="border border-sky-300"></td>
-
-                <td className="border border-sky-300"></td>
-              </tr>
+                  {[1, 2].map((shift) => (
+                    <td
+                      key={shift}
+                      className="border border-sky-300 align-top p-2 "
+                    >
+                      <div className="grid grid-cols-2 gap-2">
+                        {getBaristas(day, shift).map(
+                          (item: any, index: number) => (
+                            <div
+                              key={index}
+                              className="bg-red-100 text-gray-800 px-3 py-2 rounded-lg text-sm font-medium"
+                            >
+                              {item.employee?.staff_name || "Unknown Employee"}
+                              <span className="text-xs text-gray-500 ml-2">
+                                ({item.employee?.staff_role || "Unknown Role"})
+                              </span>
+                            </div>
+                          ),
+                        )}
+                      </div>
+                    </td>
+                  ))}
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>

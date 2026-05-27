@@ -16,6 +16,36 @@ export default function Page() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    // CHECK SHIFT LIMIT
+    const { data: existingShift, error: shiftError } = await supabase
+      .from("bookSchedule")
+      .select("*")
+      .eq("schedule_date", selectedDate)
+      .eq("schedule_shift", selectedShift);
+
+    if (shiftError) {
+      console.log(shiftError);
+      return;
+    }
+
+    // LIMIT 2 STAFF
+    if (existingShift.length >= 2) {
+      alert("This shift already has 2 baristas.");
+      return;
+    }
+
+    // CHECK DUPLICATE STAFF
+    const alreadyBooked = existingShift.find(
+      (item: any) => item.staff_id == selectedBarista,
+    );
+
+    if (alreadyBooked) {
+      alert("You already booked this shift.");
+      return;
+    }
+
+    // INSERT
     const { data, error } = await supabase.from("bookSchedule").insert([
       {
         staff_id: selectedBarista,
@@ -23,18 +53,21 @@ export default function Page() {
         schedule_shift: selectedShift,
       },
     ]);
-    console.log(selectedBarista, selectedDate, selectedShift);
-
 
     if (error) {
       console.log(error);
       alert("Failed to create schedule");
     } else {
       console.log(data);
-      alert("Schedule created successfully!");
-    }
 
-    e.preventDefault();
+      alert("Schedule created successfully!");
+
+      // RESET FORM
+      setSelectedBarista("");
+      setSelectedRole("");
+      setSelectedShift("");
+      setSelectedDate("");
+    }
   };
 
   useEffect(() => {
