@@ -4,6 +4,7 @@ import { createClient } from "@/utils/supabase/client";
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import Sidebar from "../components/sidebar";
 
 export default function Page() {
   const supabase = createClient();
@@ -48,32 +49,7 @@ export default function Page() {
     <div className="flex min-h-screen bg-gray-100">
 
       {/* Sidebar */}
-      <div className="w-64 bg-gray-900 text-white p-5 flex flex-col items-center">
-
-        <Image
-          className="mb-4"
-          src="/logo_amber.png"
-          alt="Amber Coffee logo"
-          width={200}
-          height={200}
-          priority
-        />
-
-        <ul className="space-y-4 mt-10">
-          <li>
-            <Link href="/dashboard" className="hover:text-gray-300">
-              Dashboard
-            </Link>
-          </li>
-
-          <li>
-            <Link href="/attendance" className="hover:text-gray-300">
-              Attendance
-            </Link>
-          </li>
-        </ul>
-
-      </div>
+      <Sidebar/>
 
       {/* Main Content */}
       <div className="flex-1 p-8 relative">
@@ -167,7 +143,7 @@ export default function Page() {
               </p>
 
               <p className="text-gray-600">
-                {employee.staff_role.toUpperCase()}
+                {employee.staff_role}
               </p>
             </div>
 

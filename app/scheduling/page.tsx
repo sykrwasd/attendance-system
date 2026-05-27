@@ -4,6 +4,7 @@ import { createClient } from "@/utils/supabase/client";
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import Sidebar from "../components/sidebar";
 
 export default function Page() {
   const supabase = createClient();
@@ -100,34 +101,9 @@ export default function Page() {
   }
 
   return (
-    <div className="min-h-screen flex bg-gray-100">
+    <div className="min-h-screen flex bg-slate-50">
       {/* Sidebar */}
-      <div className="w-64 bg-gray-900 text-white p-5 flex flex-col items-center">
-        <div>
-          <Image
-            className="mb-4"
-            src="/logo_amber.png"
-            alt="Amber Coffee logo"
-            width={200}
-            height={200}
-            priority
-          />
-        </div>
-
-        <ul className="space-y-4 mt-10">
-          <li>
-            <Link href="/dashboard" className="hover:text-gray-300">
-              Dashboard
-            </Link>
-          </li>
-
-          <li>
-            <Link href="/attendance" className="hover:text-gray-300">
-              Book Schedule
-            </Link>
-          </li>
-        </ul>
-      </div>
+       <Sidebar/>
 
       {/* Main Content */}
       <div className="flex-1 p-10 overflow-y-auto">
@@ -146,7 +122,7 @@ export default function Page() {
 
             <Link
               href="/attendance"
-              className="text-sm bg-gray-500 hover:bg-gray-600 px-4 py-2 rounded-lg transition"
+              className="text-sm bg-orange-700 hover:bg-orange-800 text-white px-4 py-2 rounded-lg transition"
             >
               Back
             </Link>
@@ -165,7 +141,7 @@ export default function Page() {
                 name="barista"
                 value={selectedBarista}
                 onChange={(e) => setSelectedBarista(e.target.value)}
-                className="text-gray-700 w-full border border-gray-700 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+                className="text-gray-700 w-full border border-gray-700 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-orange-500"
               >
                 <option value="" disabled>
                   Select a barista
@@ -186,7 +162,7 @@ export default function Page() {
                 name="role"
                 value={selectedRole}
                 onChange={(e) => setSelectedRole(e.target.value)}
-                className="text-gray-700 w-full border border-gray-700 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+                className="text-gray-700 w-full border border-gray-700 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-orange-500"
               >
                 <option value="" disabled>
                   Select a role
@@ -209,7 +185,7 @@ export default function Page() {
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
                 min={new Date().toISOString().split("T")[0]}
-                className="text-gray-700 w-full border border-gray-300 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+                className="text-gray-700 w-full border border-gray-300 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-orange-500"
                 required
               />
             </div>
@@ -225,13 +201,18 @@ export default function Page() {
                 name="shift"
                 value={selectedShift}
                 onChange={(e) => setSelectedShift(e.target.value)}
-                className="text-gray-700 w-full border border-gray-700 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+                className="text-gray-700 w-full border border-gray-700 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-orange-500"
               >
                 <option value="" disabled>
                   Select a shift
                 </option>
-                <option value={1}>4.00 PM - 7.30 PM</option>
-                <option value={2}>7.30 PM - 11.00 PM</option>
+                <option value={1}>4PM - 5PM</option>
+                <option value={2}>5PM - 6PM</option>
+                <option value={3}>6PM - 7PM</option>
+                <option value={4}>7PM - 8PM</option>
+                <option value={5}>8PM - 9PM</option>
+                <option value={6}>9PM - 10PM</option>
+                <option value={7}>10PM - 11PM</option>
               </select>
             </div>
 
@@ -239,7 +220,7 @@ export default function Page() {
             <div className="flex justify-end gap-4 pt-4">
               <button
                 type="submit"
-                className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold transition"
+                className="bg-orange-700 hover:bg-orange-800 text-white px-6 py-3 rounded-xl font-semibold transition"
               >
                 Submit
               </button>

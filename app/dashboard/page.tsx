@@ -4,6 +4,7 @@ import { createClient } from "@/utils/supabase/client";
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import Sidebar from "../components/sidebar";
 
 export default function Page() {
   const supabase = createClient();
@@ -46,32 +47,9 @@ export default function Page() {
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="flex min-h-screen bg-slate-50">
       {/* Sidebar */}
-      <div className="w-64 bg-gray-900 text-white p-5 flex flex-col items-center">
-        <Image
-          className="mb-4"
-          src="/logo_amber.png"
-          alt="Amber Coffee logo"
-          width={200}
-          height={200}
-          priority
-        />
-
-        <ul className="space-y-4 mt-10">
-          <li>
-            <Link href="/dashboard" className="hover:text-gray-300">
-              Dashboard
-            </Link>
-          </li>
-
-          <li>
-            <Link href="/attendance" className="hover:text-gray-300">
-              Book Schedule
-            </Link>
-          </li>
-        </ul>
-      </div>
+      <Sidebar/>
 
       {/* Main Content */}
       <div className="flex-1 p-8">
@@ -81,7 +59,7 @@ export default function Page() {
             onClick={() => setShowMenu(!showMenu)}
             className="flex items-center gap-3 bg-white px-4 py-2 rounded-xl shadow hover:bg-gray-50"
           >
-            <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center font-bold">
+            <div className="w-10 h-10 rounded-full bg-orange-700 text-white flex items-center justify-center font-bold">
               {employee.staff_name.charAt(0).toUpperCase()}
             </div>
 
@@ -139,18 +117,18 @@ export default function Page() {
           <div className="bg-white rounded-2xl shadow p-6">
             <p className="text-gray-500 text-sm">Total Orders</p>
 
-            <h2 className="text-3xl font-bold mt-2 text-blue-600">320</h2>
+            <h2 className="text-3xl font-bold mt-2 text-orange-700">320</h2>
 
-            <p className="text-sm text-blue-500 mt-2">+20 new orders</p>
+            <p className="text-sm text-orange-600 mt-2">+20 new orders</p>
           </div>
 
           {/* Customers */}
           <div className="bg-white rounded-2xl shadow p-6">
             <p className="text-gray-500 text-sm">Customers</p>
 
-            <h2 className="text-3xl font-bold mt-2 text-purple-600">120</h2>
+            <h2 className="text-3xl font-bold mt-2 text-orange-700">120</h2>
 
-            <p className="text-sm text-purple-500 mt-2">
+            <p className="text-sm text-orange-600 mt-2">
               Active customers today
             </p>
           </div>
@@ -163,7 +141,7 @@ export default function Page() {
           <div className="overflow-x-auto">
             <table className="w-full border-collapse text-gray-700">
               <thead>
-                <tr className="bg-gray-100 text-left">
+                <tr className="bg-orange-50 text-left text-orange-800">
                   <th className="p-3">Order ID</th>
                   <th className="p-3">Customer</th>
                   <th className="p-3">Product</th>
