@@ -52,9 +52,9 @@ export default function Page() {
       <Sidebar/>
 
       {/* Main Content */}
-      <div className="flex-1 p-8">
+      <div className="flex-1 min-w-0 p-4 pt-16 md:p-8 md:pt-8">
         {/* Top Navbar */}
-        <div className="flex justify-end items-center mb-6 relative">
+        <div className="flex justify-end items-center mb-6 relative pl-10 md:pl-0">
           <button
             onClick={() => setShowMenu(!showMenu)}
             className="flex items-center gap-3 bg-white px-4 py-2 rounded-xl shadow hover:bg-gray-50"
@@ -139,52 +139,48 @@ export default function Page() {
           <h2 className="text-xl font-bold text-gray-800 mb-4">Recent Sales</h2>
 
           <div className="overflow-x-auto">
-            <table className="w-full border-collapse text-gray-700">
+            <table className="w-full border-collapse text-gray-700 text-sm">
               <thead>
                 <tr className="bg-orange-50 text-left text-orange-800">
-                  <th className="p-3">Order ID</th>
-                  <th className="p-3">Customer</th>
-                  <th className="p-3">Product</th>
-                  <th className="p-3">Amount</th>
-                  <th className="p-3">Status</th>
+                  <th className="p-2 md:p-3">Order ID</th>
+                  <th className="p-2 md:p-3">Customer</th>
+                  <th className="p-2 md:p-3 hidden sm:table-cell">Product</th>
+                  <th className="p-2 md:p-3">Amount</th>
+                  <th className="p-2 md:p-3">Status</th>
                 </tr>
               </thead>
 
               <tbody>
                 <tr className="border-b">
-                  <td className="p-3">#1001</td>
-                  <td className="p-3">Ali</td>
-                  <td className="p-3">Latte</td>
-                  <td className="p-3">RM 18</td>
-                  <td className="p-3 text-green-600 font-semibold">
-                    Completed
-                  </td>
+                  <td className="p-2 md:p-3">#1001</td>
+                  <td className="p-2 md:p-3">Ali</td>
+                  <td className="p-2 md:p-3 hidden sm:table-cell">Latte</td>
+                  <td className="p-2 md:p-3">RM 18</td>
+                  <td className="p-2 md:p-3 text-green-600 font-semibold">Completed</td>
                 </tr>
 
                 <tr className="border-b">
-                  <td className="p-3">#1002</td>
-                  <td className="p-3">Siti</td>
-                  <td className="p-3">Cappuccino</td>
-                  <td className="p-3">RM 22</td>
-                  <td className="p-3 text-yellow-600 font-semibold">Pending</td>
+                  <td className="p-2 md:p-3">#1002</td>
+                  <td className="p-2 md:p-3">Siti</td>
+                  <td className="p-2 md:p-3 hidden sm:table-cell">Cappuccino</td>
+                  <td className="p-2 md:p-3">RM 22</td>
+                  <td className="p-2 md:p-3 text-yellow-600 font-semibold">Pending</td>
                 </tr>
 
                 <tr className="border-b">
-                  <td className="p-3">#1003</td>
-                  <td className="p-3">John</td>
-                  <td className="p-3">Americano</td>
-                  <td className="p-3">RM 15</td>
-                  <td className="p-3 text-green-600 font-semibold">
-                    Completed
-                  </td>
+                  <td className="p-2 md:p-3">#1003</td>
+                  <td className="p-2 md:p-3">John</td>
+                  <td className="p-2 md:p-3 hidden sm:table-cell">Americano</td>
+                  <td className="p-2 md:p-3">RM 15</td>
+                  <td className="p-2 md:p-3 text-green-600 font-semibold">Completed</td>
                 </tr>
 
                 <tr>
-                  <td className="p-3">#1004</td>
-                  <td className="p-3">Maryam</td>
-                  <td className="p-3">Mocha</td>
-                  <td className="p-3">RM 25</td>
-                  <td className="p-3 text-red-600 font-semibold">Cancelled</td>
+                  <td className="p-2 md:p-3">#1004</td>
+                  <td className="p-2 md:p-3">Maryam</td>
+                  <td className="p-2 md:p-3 hidden sm:table-cell">Mocha</td>
+                  <td className="p-2 md:p-3">RM 25</td>
+                  <td className="p-2 md:p-3 text-red-600 font-semibold">Cancelled</td>
                 </tr>
               </tbody>
             </table>

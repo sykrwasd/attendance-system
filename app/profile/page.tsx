@@ -100,7 +100,7 @@ export default function Page() {
       <Sidebar />
 
       {/* Main Content */}
-      <div className="flex-1 p-8 relative">
+      <div className="flex-1 min-w-0 p-4 pt-16 md:p-8 md:pt-8 relative">
         {/* Top Navbar */}
         <div className="flex justify-end mb-6 relative">
           <button

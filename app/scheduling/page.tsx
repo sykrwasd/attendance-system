@@ -106,7 +106,7 @@ export default function Page() {
        <Sidebar/>
 
       {/* Main Content */}
-      <div className="flex-1 p-10 overflow-y-auto">
+      <div className="flex-1 min-w-0 p-4 pt-16 md:p-10 md:pt-10 overflow-y-auto">
         <div className="bg-white max-w-3xl rounded-2xl shadow-lg p-8 mx-auto">
           {/* Header */}
           <div className="flex items-center justify-between mb-8">

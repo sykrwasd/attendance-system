@@ -96,7 +96,12 @@ export default function AttendancePage() {
     return d;
   };
 
-  const toDateStr = (d: Date) => d.toISOString().split("T")[0];
+  const toDateStr = (d: Date) => {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  };
 
   const getWeekRange = (offset: number) => {
     const { sunday, saturday } = getWeekDates(offset);
@@ -125,7 +130,7 @@ export default function AttendancePage() {
 
   const getBaristas = (day: string, shift: number) =>
     scheduleData.filter((item: any) => {
-      const itemDay = days[new Date(item.schedule_date).getDay()];
+      const itemDay = days[new Date(item.schedule_date + "T00:00:00").getDay()];
       return itemDay === day && item.schedule_shift === shiftToTime[shift];
     });
 
@@ -236,10 +241,10 @@ export default function AttendancePage() {
     <div className="flex min-h-screen bg-slate-50">
       <Sidebar />
 
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 min-w-0 flex flex-col overflow-hidden">
 
         {/* Top Bar */}
-        <div className="bg-white border-b border-slate-200 px-8 py-4 flex justify-between items-center">
+        <div className="bg-white border-b border-slate-200 px-8 py-4 pl-16 md:pl-8 flex justify-between items-center">
           <div>
             <h1 className="text-xl font-bold text-slate-800 tracking-tight">
               Attendance Schedule
@@ -316,8 +321,8 @@ export default function AttendancePage() {
 
         {/* Grid */}
         <div className="flex-1 p-6 overflow-auto">
-          <div className={`bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden transition-opacity duration-200 ${loadingSchedule ? "opacity-50" : "opacity-100"}`}>
-            <table className="w-full border-collapse">
+          <div className={`bg-white rounded-2xl shadow-sm border border-slate-200 overflow-x-auto transition-opacity duration-200 ${loadingSchedule ? "opacity-50" : "opacity-100"}`}>
+            <table className="min-w-[640px] w-full border-collapse">
               <thead>
                 <tr>
                   <th className="w-20 bg-white border-b border-r border-slate-200 p-3" />
