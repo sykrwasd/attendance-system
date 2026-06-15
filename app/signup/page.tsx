@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useState } from "react";
 import { createClient } from "@/utils/supabase/client";
+import toast from "react-hot-toast";
 
 export default function SignUp() {
   const supabase = createClient();
@@ -11,7 +12,9 @@ export default function SignUp() {
     email: "",
     password: "",
     confirmPassword: "",
+    inviteCode: "",
   });
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -20,10 +23,17 @@ export default function SignUp() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match!");
+    if (formData.inviteCode !== process.env.NEXT_PUBLIC_INVITE_CODE) {
+      toast.error("Invalid invite code.");
       return;
     }
+
+    if (formData.password !== formData.confirmPassword) {
+      toast.error("Passwords do not match.");
+      return;
+    }
+
+    setLoading(true);
 
     const { data: existingUser, error: checkError } = await supabase
       .from("employee")
@@ -32,37 +42,33 @@ export default function SignUp() {
       .single();
 
     if (existingUser) {
-      alert("Email sudah wujud!");
+      toast.error("Email already registered.");
+      setLoading(false);
       return;
     }
 
     if (checkError && checkError.code !== "PGRST116") {
-      console.log(checkError);
-      alert("Error checking email");
+      toast.error("Error checking email.");
+      setLoading(false);
       return;
     }
 
-    const { data, error } = await supabase.from("employee").insert([
+    const { error } = await supabase.from("employee").insert([
       {
         staff_name: formData.name,
         staff_email: formData.email,
         password: formData.password,
+        staff_role: "Barista",
       },
     ]);
 
-    if (error) {
-      console.log(error);
-      alert("Failed to create account");
-    } else {
-      console.log(data);
-      alert("Account created successfully!");
+    setLoading(false);
 
-      setFormData({
-        name: "",
-        email: "",
-        password: "",
-        confirmPassword: "",
-      });
+    if (error) {
+      toast.error("Failed to create account.");
+    } else {
+      toast.success("Account created! You can now log in.");
+      setFormData({ name: "", email: "", password: "", confirmPassword: "", inviteCode: "" });
     }
   };
 
@@ -90,10 +96,22 @@ export default function SignUp() {
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <label
-              htmlFor="name"
-              className="text-sm font-medium text-zinc-700 dark:text-zinc-300"
-            >
+            <label htmlFor="inviteCode" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+              Invite Code
+            </label>
+            <input
+              id="inviteCode"
+              type="text"
+              placeholder="Enter staff invite code"
+              required
+              value={formData.inviteCode}
+              onChange={handleChange}
+              className="flex h-10 w-full rounded-md border border-zinc-300 bg-transparent px-3 py-2 text-sm placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-orange-500 dark:border-zinc-700"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label htmlFor="name" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
               Full Name
             </label>
             <input
@@ -103,15 +121,12 @@ export default function SignUp() {
               required
               value={formData.name}
               onChange={handleChange}
-              className="flex h-10 w-full rounded-md border border-zinc-300 bg-transparent px-3 py-2 text-sm placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-black dark:border-zinc-700 dark:focus:ring-white"
+              className="flex h-10 w-full rounded-md border border-zinc-300 bg-transparent px-3 py-2 text-sm placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-orange-500 dark:border-zinc-700"
             />
           </div>
 
           <div className="space-y-2">
-            <label
-              htmlFor="email"
-              className="text-sm font-medium text-zinc-700 dark:text-zinc-300"
-            >
+            <label htmlFor="email" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
               Email address
             </label>
             <input
@@ -121,15 +136,12 @@ export default function SignUp() {
               required
               value={formData.email}
               onChange={handleChange}
-              className="flex h-10 w-full rounded-md border border-zinc-300 bg-transparent px-3 py-2 text-sm placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-black dark:border-zinc-700 dark:focus:ring-white"
+              className="flex h-10 w-full rounded-md border border-zinc-300 bg-transparent px-3 py-2 text-sm placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-orange-500 dark:border-zinc-700"
             />
           </div>
 
           <div className="space-y-2">
-            <label
-              htmlFor="password"
-              className="text-sm font-medium text-zinc-700 dark:text-zinc-300"
-            >
+            <label htmlFor="password" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
               Password
             </label>
             <input
@@ -139,15 +151,12 @@ export default function SignUp() {
               required
               value={formData.password}
               onChange={handleChange}
-              className="flex h-10 w-full rounded-md border border-zinc-300 bg-transparent px-3 py-2 text-sm placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-black dark:border-zinc-700 dark:focus:ring-white"
+              className="flex h-10 w-full rounded-md border border-zinc-300 bg-transparent px-3 py-2 text-sm placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-orange-500 dark:border-zinc-700"
             />
           </div>
 
           <div className="space-y-2">
-            <label
-              htmlFor="confirmPassword"
-              className="text-sm font-medium text-zinc-700 dark:text-zinc-300"
-            >
+            <label htmlFor="confirmPassword" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
               Confirm Password
             </label>
             <input
@@ -157,24 +166,23 @@ export default function SignUp() {
               required
               value={formData.confirmPassword}
               onChange={handleChange}
-              className="flex h-10 w-full rounded-md border border-zinc-300 bg-transparent px-3 py-2 text-sm placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-black dark:border-zinc-700 dark:focus:ring-white"
+              className="flex h-10 w-full rounded-md border border-zinc-300 bg-transparent px-3 py-2 text-sm placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-orange-500 dark:border-zinc-700"
             />
           </div>
 
           <button
             type="submit"
-            className="flex h-10 w-full items-center justify-center rounded-md bg-black px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
+            disabled={loading}
+            className="flex h-10 w-full items-center justify-center gap-2 rounded-md bg-black px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:opacity-50 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
           >
-            Create Account
+            {loading && <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin dark:border-black/40 dark:border-t-black" />}
+            {loading ? "Creating…" : "Create Account"}
           </button>
         </form>
 
         <div className="text-center text-sm text-zinc-500">
           Already have an account?{" "}
-          <a
-            href="/login"
-            className="font-medium text-black underline-offset-4 hover:underline dark:text-white"
-          >
+          <a href="/login" className="font-medium text-black underline-offset-4 hover:underline dark:text-white">
             Log in
           </a>
         </div>

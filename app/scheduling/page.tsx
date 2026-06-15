@@ -4,6 +4,7 @@ import { createClient } from "@/utils/supabase/client";
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import Sidebar from "../components/sidebar";
 
 export default function Page() {
@@ -32,7 +33,7 @@ export default function Page() {
 
     // LIMIT 2 STAFF
     if (existingShift.length >= 2) {
-      alert("This shift already has 2 baristas.");
+      toast.error("This shift already has 2 baristas.");
       return;
     }
 
@@ -42,7 +43,7 @@ export default function Page() {
     );
 
     if (alreadyBooked) {
-      alert("You already booked this shift.");
+      toast.error("You already booked this shift.");
       return;
     }
 
@@ -57,11 +58,10 @@ export default function Page() {
 
     if (error) {
       console.log(error);
-      alert("Failed to create schedule");
+      toast.error("Failed to create schedule.");
     } else {
       console.log(data);
-
-      alert("Schedule created successfully!");
+      toast.success("Schedule created successfully!");
 
       // RESET FORM
       setSelectedBarista("");
@@ -101,21 +101,21 @@ export default function Page() {
   }
 
   return (
-    <div className="min-h-screen flex bg-slate-50">
+    <div className="min-h-screen flex bg-slate-50 dark:bg-slate-950">
       {/* Sidebar */}
        <Sidebar/>
 
       {/* Main Content */}
       <div className="flex-1 min-w-0 p-4 pt-16 md:p-10 md:pt-10 overflow-y-auto">
-        <div className="bg-white max-w-3xl rounded-2xl shadow-lg p-8 mx-auto">
+        <div className="bg-white dark:bg-slate-800 max-w-3xl rounded-2xl shadow-lg p-8 mx-auto">
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-3xl font-bold text-gray-800">
+              <h1 className="text-3xl font-bold text-gray-800 dark:text-slate-100">
                 Booking Schedule
               </h1>
 
-              <p className="text-gray-500 mt-1">
+              <p className="text-gray-500 dark:text-slate-400 mt-1">
                 Create barista working schedule
               </p>
             </div>
@@ -132,7 +132,7 @@ export default function Page() {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Barista Name */}
             <div>
-              <label className="block text-sm font-semibold mb-2 text-gray-700">
+              <label className="block text-sm font-semibold mb-2 text-gray-700 dark:text-slate-300">
                 Barista Name
               </label>
 
@@ -141,7 +141,7 @@ export default function Page() {
                 name="barista"
                 value={selectedBarista}
                 onChange={(e) => setSelectedBarista(e.target.value)}
-                className="text-gray-700 w-full border border-gray-700 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-orange-500"
+                className="text-gray-700 dark:text-slate-100 bg-white dark:bg-slate-700 w-full border border-gray-300 dark:border-slate-600 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-orange-500"
               >
                 <option value="" disabled>
                   Select a barista
@@ -153,7 +153,7 @@ export default function Page() {
 
             {/* Role */}
             <div>
-              <label className="block text-sm font-semibold mb-2 text-gray-700">
+              <label className="block text-sm font-semibold mb-2 text-gray-700 dark:text-slate-300">
                 Role
               </label>
 
@@ -162,7 +162,7 @@ export default function Page() {
                 name="role"
                 value={selectedRole}
                 onChange={(e) => setSelectedRole(e.target.value)}
-                className="text-gray-700 w-full border border-gray-700 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-orange-500"
+                className="text-gray-700 dark:text-slate-100 bg-white dark:bg-slate-700 w-full border border-gray-300 dark:border-slate-600 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-orange-500"
               >
                 <option value="" disabled>
                   Select a role
@@ -175,7 +175,7 @@ export default function Page() {
 
             {/* Working Date */}
             <div>
-              <label className="block text-sm font-semibold mb-2 text-gray-700">
+              <label className="block text-sm font-semibold mb-2 text-gray-700 dark:text-slate-300">
                 Working Date
               </label>
 
@@ -185,14 +185,14 @@ export default function Page() {
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
                 min={new Date().toISOString().split("T")[0]}
-                className="text-gray-700 w-full border border-gray-300 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-orange-500"
+                className="text-gray-700 dark:text-slate-100 bg-white dark:bg-slate-700 w-full border border-gray-300 dark:border-slate-600 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-orange-500"
                 required
               />
             </div>
 
             {/* Start & End Time */}
             <div className="flex-1">
-              <label className="block text-sm font-semibold mb-2 text-gray-700">
+              <label className="block text-sm font-semibold mb-2 text-gray-700 dark:text-slate-300">
                 Select Shift
               </label>
 
@@ -201,7 +201,7 @@ export default function Page() {
                 name="shift"
                 value={selectedShift}
                 onChange={(e) => setSelectedShift(e.target.value)}
-                className="text-gray-700 w-full border border-gray-700 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-orange-500"
+                className="text-gray-700 dark:text-slate-100 bg-white dark:bg-slate-700 w-full border border-gray-300 dark:border-slate-600 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-orange-500"
               >
                 <option value="" disabled>
                   Select a shift
